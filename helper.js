@@ -6,9 +6,9 @@
  * @updated 2020/10/15
  */
 
-const fb = {
+const helper = {
     /**
-     * initialize fb
+     * initialize helper
      *
      * @author  dew9163
      * @added   2020/08/13
@@ -126,4 +126,4 @@ const fb = {
     }
 };
 
-export {fb}
+export {helper}
