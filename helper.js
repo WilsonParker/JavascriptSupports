@@ -123,6 +123,12 @@ const helper = {
             params[key] = value;
             return this.buildQueryString(params);
         },
+    },
+
+    time : {
+        loadAfterTime : function(callback, time){
+            setTimeout(callback, time);
+        }
     }
 };
 
