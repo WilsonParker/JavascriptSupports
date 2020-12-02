@@ -1,7 +1,7 @@
 /**
  * 전역으로 사용할 javascript
  *
- * @author  dew9163
+ * @author  WilsonParker
  * @added   2020/08/03
  * @updated 2020/10/15
  */
@@ -10,7 +10,7 @@ const helper = {
     /**
      * initialize helper
      *
-     * @author  dew9163
+     * @author  WilsonParker
      * @added   2020/08/13
      * @updated 2020/08/13
      */
@@ -18,10 +18,230 @@ const helper = {
         this.cookie.init();
     },
 
-    logger: {
-        log: function (message) {
-            console.log(message);
+    object: {
+        isSet: function (val) {
+            return !this.isNonSet(val);
+        },
+        isNonSet: function (val) {
+            return (val === "" || val === '' || val === undefined || val === "undefined" || val == null || typeof val == 'undefined');
+        },
+        isEmpty: function (val) {
+            if (typeof val === 'array') {
+                return this.isEmptyArray(val);
+            } else if (typeof val === 'string') {
+                return this.isEmptyString(val);
+            } else if (typeof val === 'object') {
+                return this.isEmptyObject(val);
+            } else {
+                return this.isEmptyObject(val);
+            }
+        },
+        isNonEmpty: function (val) {
+            return !this.isEmpty(val);
+        },
+        isEmptyString: function (val) {
+            return this.isSet(val) && (val === "\"\"" || val === "\'\'");
+        },
+        isNonEmptyString: function (val) {
+            return !this.isEmptyString(val);
+        },
+        isEmptyObject: function (val) {
+            return this.isSet(val) && (val === "\"\"" || val === "\'\'");
+        },
+        isEmptyArray: function (val) {
+            return !this.isNonEmptyArray(val);
+        },
+        isNonEmptyArray: function (val) {
+            return Array.isArray(val) && val.length > 0 && this.isSet(val);
+        },
+        isEmptyMap: function (val) {
+            return this.length(val) < 1;
+        },
+        isNonEmptyMap: function (val) {
+            return !this.isEmptyMap(val);
+        },
+        inArray: function (arr, val) {
+            return this.isNonEmptyArray(arr) && arr.includes(val);
+        },
+
+        length: function (val) {
+            if (this.isNonSet(val))
+                return 0;
+            if (Array.isArray(val) || val.length !== undefined)
+                return val.length;
+            else
+                return val.keys !== undefined ? val.size : Object.keys(val).length;
+        },
+        replaceAll: function (str, org, dest) {
+            return this.isSet(str) ? str.split(org).join(dest) : "";
+        },
+
+        isFunction: function (functionToCheck) {
+            return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+        },
+
+        /**
+         * collector 를 forEach 하면서 callback 을 실행시킵니다
+         *
+         * @param   collector
+         * @param   callback: function(element, value, idx, resultCallback, carry)
+         * 각각의 element, 값, 순서, resultCallback, carry 를 넘겨받습니다
+         * @param   resultCallback: callback
+         * @param   carry
+         * callback 에 결과를 유지하기 위한 값
+         * @return  String | returnCallback
+         * @author  WilsonParker
+         * @added   2019-05-14
+         * @updated 2019-05-14
+         */
+        forEach: function (collector, callback, resultCallback, carry) {
+            let keys = Object.keys(collector);
+            Object.values = Object.values || this.objectValuesPolyfill;
+            let values = Object.values(collector);
+            let idx = 0;
+            let result = this.isNonSet(carry) ? "" : carry;
+            keys.forEach(function (element) {
+                let v = values[element] !== undefined ? values[element] : values[idx];
+                if (cm.object.isNonSet(resultCallback)) {
+                    result += callback(element, v, idx, resultCallback, carry);
+                } else {
+                    result = carry;
+                    callback(element, v, idx, resultCallback, carry);
+                }
+                idx++;
+            });
+            return result;
+        },
+        /**
+         * forEach 에서 length 만큼만 반복합니다
+         *
+         * @param   collector
+         * @param   length
+         * @param   callback
+         * @param   resultCallback
+         * @param   carry
+         * @return
+         * @author  WilsonParker
+         * @added   2019-08-27
+         * @updated 2019-08-27
+         */
+        forEachWithLength: function (collector, length = -1, callback, resultCallback, carry) {
+            let keys = Object.keys(collector);
+            Object.values = Object.values || this.objectValuesPolyfill;
+            let values = Object.values(collector);
+            let result = this.isNonSet(carry) ? "" : carry;
+            let rLength = length === -1 || cm.object.isNonSet(length) ? cm.object.length(collector) : length;
+            for (let idx = 0; idx < rLength; idx++) {
+                let element = keys[idx];
+                let v = values[element] !== undefined ? values[element] : values[idx];
+                if (cm.object.isNonSet(resultCallback)) {
+                    result += callback(element, v, idx, resultCallback, carry);
+                } else {
+                    result = carry;
+                    callback(element, v, idx, resultCallback, carry);
+                }
+            }
+            return result;
+        },
+        /**
+         * html tag 의 attributes 중 data-obj 의 값을 가져옵니다
+         *
+         * @param   obj
+         * @return  object
+         * @author  WilsonParker
+         * @added   2019-08-27
+         * @updated 2019-08-27
+         */
+        getDataObj: function (obj) {
+            let data = "";
+            let dataObj = typeof obj === 'string' ? $(obj) : obj;
+            if (dataObj.getAttribute !== undefined) {
+                data = dataObj.getAttribute('data-obj');
+            } else if (dataObj.attr !== undefined) {
+                data = dataObj.attr('data-obj');
+            }
+            let json = cm.object.replaceAll(data, "\'", "\"");
+            return this.isSet(json) ? JSON.parse(json) : "";
+        },
+        /**
+         * html tag 의 attributes 중 data-obj 의 값을 설정 합니다
+         *
+         * @param   obj
+         * @param   key
+         * @param   value
+         * @return  object
+         * @author  WilsonParker
+         * @added   2019-08-27
+         * @updated 2019-08-27
+         */
+        setDataObj: function (obj, key, value) {
+            let data = this.getDataObj(obj);
+            data[key] = value;
+            return $(obj).attr('data-obj', JSON.stringify(data))[0];
+        },
+        /**
+         * html tag 의 attributes 중 data-obj 의 값에서 key 를 제거합니다
+         *
+         * @param   obj
+         * @param   key
+         * @param   value
+         * @return  object
+         * @author  WilsonParker
+         * @added   2019-08-27
+         * @updated 2019-08-27
+         */
+        removeDataObj: function (obj, key) {
+            let data = cm.object.getDataObj(obj);
+            delete data[key];
+            return $(obj).attr('data-obj', JSON.stringify(data))[0];
+        },
+
+        objectToEntriesPolyfill: function (object) {
+            return Object
+                .keys(object)
+                .map(
+                    function (key) {
+                        return [key, object[key]];
+                    }
+                );
+        },
+
+        objectValuesPolyfill: function (object) {
+            return Object
+                .keys(object)
+                .map(
+                    function (key) {
+                        return object[key];
+                    }
+                );
         }
+    },
+
+    logger: {
+        props: {
+            isDebug: false
+        },
+        setDebug: function (debug) {
+            this.props.isDebug = debug;
+        },
+
+        /**
+         * props 의 isDebug 가 true 일 때 console.log 에 출력합니다
+         *
+         * @param   args: varargs
+         * log 를 출력할 args
+         * @return
+         * @author  WilsonParker
+         * @added   2019-06-15
+         * @updated 2019-06-15
+         */
+        log: function (args) {
+            if (this.props.isDebug) {
+                this.forEach(arguments, function (idx, item) {
+                    console.log(item);
+                });
+            }
+        },
     },
 
     functions: {
@@ -53,7 +273,7 @@ const helper = {
          * @param   name
          * name of cookie
          * @return
-         * @author  dew9163
+         * @author  WilsonParker
          * @added   2020/08/13
          * @updated 2020/08/13
          */
@@ -72,7 +292,7 @@ const helper = {
          * @param minute
          * @param second
          * @return
-         * @author  dew9163
+         * @author  WilsonParker
          * @added   2020/08/13
          * @updated 2020/08/13
          */
@@ -90,7 +310,7 @@ const helper = {
          *
          * @param params
          * @return
-         * @author  dew9163
+         * @author  WilsonParker
          * @added   2020/08/13
          * @updated 2020/08/13
          */
@@ -114,7 +334,7 @@ const helper = {
          * @param key
          * @param value
          * @return
-         * @author  dew9163
+         * @author  WilsonParker
          * @added   2020/08/13
          * @updated 2020/08/13
          */
@@ -125,8 +345,8 @@ const helper = {
         },
     },
 
-    time : {
-        loadAfterTime : function(callback, time){
+    time: {
+        loadAfterTime: function (callback, time) {
             setTimeout(callback, time);
         }
     }

@@ -1,7 +1,7 @@
 /**
  * loading class
  *
- * @author  dew9163
+ * @author  WilsonParker
  * @added   2020/09/22
  * @updated 2020/10/12
  */

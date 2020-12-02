@@ -1,7 +1,7 @@
 /**
  * alerter class
  *
- * @author  dew9163
+ * @author  WilsonParker
  * @added   2020/11/02
  * @updated 2020/11/02
  */

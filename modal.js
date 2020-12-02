@@ -1,7 +1,7 @@
 /**
  * modal class
  *
- * @author  dew9163
+ * @author  WilsonParker
  * @added   2020/12/01
  * @updated 2020/12/01
  */
