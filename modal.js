@@ -7,7 +7,7 @@
  */
 const modal = {
     props: {
-        id: 'modal'
+        id: 'basicModal'
     },
     init: function (id) {
         this.props.id = id;
@@ -35,6 +35,12 @@ const modal = {
         },
         setContent(content) {
             modal.selector.getContentModal().html(content);
+        },
+
+        parse(data) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(data, 'text/html');
+            return doc;
         },
     },
 
