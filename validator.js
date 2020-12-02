@@ -77,7 +77,7 @@ const validator = {
         buildCheckBoxMaxSelectableValidator: function (selector, size, message, invalidCallback) {
             let selectedSize = $(selector + ':checked').length;
             let callback = function () {
-                return size > 0 && selectedSize < size
+                return size > 0 && selectedSize <= size
             };
             return this.buildValidator(callback, arguments, message, invalidCallback)
         },
