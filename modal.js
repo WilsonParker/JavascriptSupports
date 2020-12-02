@@ -7,7 +7,7 @@
  */
 const modal = {
     props: {
-        id: 'basicModal'
+        id: 'componentModal'
     },
     init: function (id) {
         this.props.id = id;
