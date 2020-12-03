@@ -102,7 +102,7 @@ const helper = {
             let result = this.isNonSet(carry) ? "" : carry;
             keys.forEach(function (element) {
                 let v = values[element] !== undefined ? values[element] : values[idx];
-                if (cm.object.isNonSet(resultCallback)) {
+                if (helper.object.isNonSet(resultCallback)) {
                     result += callback(element, v, idx, resultCallback, carry);
                 } else {
                     result = carry;
@@ -130,11 +130,11 @@ const helper = {
             Object.values = Object.values || this.objectValuesPolyfill;
             let values = Object.values(collector);
             let result = this.isNonSet(carry) ? "" : carry;
-            let rLength = length === -1 || cm.object.isNonSet(length) ? cm.object.length(collector) : length;
+            let rLength = length === -1 || helper.object.isNonSet(length) ? helper.object.length(collector) : length;
             for (let idx = 0; idx < rLength; idx++) {
                 let element = keys[idx];
                 let v = values[element] !== undefined ? values[element] : values[idx];
-                if (cm.object.isNonSet(resultCallback)) {
+                if (helper.object.isNonSet(resultCallback)) {
                     result += callback(element, v, idx, resultCallback, carry);
                 } else {
                     result = carry;
@@ -160,7 +160,7 @@ const helper = {
             } else if (dataObj.attr !== undefined) {
                 data = dataObj.attr('data-obj');
             }
-            let json = cm.object.replaceAll(data, "\'", "\"");
+            let json = helper.object.replaceAll(data, "\'", "\"");
             return this.isSet(json) ? JSON.parse(json) : "";
         },
         /**
@@ -191,7 +191,7 @@ const helper = {
          * @updated 2019-08-27
          */
         removeDataObj: function (obj, key) {
-            let data = cm.object.getDataObj(obj);
+            let data = helper.object.getDataObj(obj);
             delete data[key];
             return $(obj).attr('data-obj', JSON.stringify(data))[0];
         },
@@ -237,7 +237,7 @@ const helper = {
          */
         log: function (args) {
             if (this.props.isDebug) {
-                this.forEach(arguments, function (idx, item) {
+                helper.object.forEach(arguments, function (idx, item) {
                     console.log(item);
                 });
             }
