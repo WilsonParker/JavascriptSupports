@@ -69,6 +69,21 @@ const validator = {
         },
 
         /**
+         * input 필수값 value를 체크합니다.
+         * @author  seul
+         * @added   2020/12/03
+         * @updated 2020/12/03
+         */
+        buildRequiredValidator : function (selector, message, invalidCallback) {
+            let value = $(selector).val().trim();
+            let callback = function () {
+                return value;
+            }
+
+            return this.buildValidator(callback, arguments, message, invalidCallback)
+        },
+
+        /**
          * checkbox 의 최대 선택 가능한 수를 검사 합니다
          * @author  dew9163
          * @added   2020/12/02
