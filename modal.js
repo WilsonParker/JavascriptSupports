@@ -3,7 +3,7 @@
  *
  * @author  WilsonParker
  * @added   2020/12/01
- * @updated 2020/12/01
+ * @updated 2020/12/08
  */
 const modal = {
     props: {
@@ -15,6 +15,12 @@ const modal = {
 
     show: function () {
         this.selector.getModal().modal('show');
+    },
+
+    confirm: function (message, callback) {
+        if(confirm(message)) {
+            callback();
+        }
     },
 
     selector: {
