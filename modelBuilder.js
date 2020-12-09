@@ -28,6 +28,9 @@ const modelBuilder = {
         setAttribute: function (model, key, attr, data, modelAttr) {
             modelBuilder.selector.getModelItem(model, key, modelAttr).attr(attr, data);
         },
+        setCSS: function (model, key, css, data, modelAttr) {
+            modelBuilder.selector.getModelItem(model, key, modelAttr).css(css, data);
+        },
 
         showArrowUp: function (model) {
             this.showArrow(model, 'inline', 'none');
