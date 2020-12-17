@@ -19,7 +19,6 @@ const summernoteEditor = {
     },
 
     init: function (options) {
-        console.log(Object.assign(this.attributes, options));
         $('.' + this.props.class).summernote(Object.assign(this.attributes, options));
     },
 
