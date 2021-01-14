@@ -4,7 +4,7 @@
  * babel public/common/js/babel -d public/common/js -w
  * command 를 사용해서 ie 에도 적용가능한 script 로 compile 해야 합니다
  *
- * @author  TaehyunJeong
+ * @author   WilsonParker
  * @created 2019-05-31
  * @updated 2019-08-26
  */
@@ -29,7 +29,7 @@ const cm = {
              * @param   args: varargs
              * log 를 출력할 args
              * @return
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-06-15
              * @updated 2019-06-15
              */
@@ -112,7 +112,7 @@ const cm = {
              * @param   carry
              * callback 에 결과를 유지하기 위한 값
              * @return  String | returnCallback
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-05-14
              * @updated 2019-05-14
              */
@@ -143,7 +143,7 @@ const cm = {
              * @param   resultCallback
              * @param   carry
              * @return
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -170,7 +170,7 @@ const cm = {
              *
              * @param   obj
              * @return  object
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -192,7 +192,7 @@ const cm = {
              * @param   key
              * @param   value
              * @return  object
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -208,7 +208,7 @@ const cm = {
              * @param   key
              * @param   value
              * @return  object
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -273,7 +273,7 @@ const cm = {
              *
              * list 의 데이터가 비어있을 경우 실행할 함수
              * @return  void
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -294,7 +294,7 @@ const cm = {
              * @param   options
              * input tag info
              * options = { type, cls, id, name, value, attr }
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-05-02
              * @updated 2019-05-02
              */
@@ -323,7 +323,7 @@ const cm = {
                  *
                  * @param
                  * @return
-                 * @author  TaehyunJeong
+                 * @author   WilsonParker
                  * @added   2019-08-20
                  * @updated 2019-08-20
                  * @Todo
@@ -362,7 +362,7 @@ const cm = {
                  * default : data-obj:"{ 'ix' : 1 }"
                  * 위의 ix 를 결과로 넘겨줍니다
                  * @return
-                 * @author  TaehyunJeong
+                 * @author   WilsonParker
                  * @added   2019-08-19
                  * @updated 2019-08-19
                  */
@@ -399,7 +399,7 @@ const cm = {
              *
              * @param   formSelector
              * URL 로 변환할 form Tag
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-05-02
              * @updated 2019-05-02
              */
@@ -418,7 +418,7 @@ const cm = {
              * @param   formSelector
              * DataObject 로 변환할 form Tag
              * @return  Object
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-05-14
              * @updated 2019-05-14
              */
@@ -441,7 +441,7 @@ const cm = {
              * @param   formSelector
              * DataObject 로 변환할 form Tag
              * @return  Object
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-05-14
              * @updated 2019-05-14
              */
@@ -599,7 +599,7 @@ const cm = {
              * input 의 이름 또는 이름 배열 입니다
              * @param   value
              * input 의 들어갈 값 또는 값 배열 입니다
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-04-22
              * @updated 2019-05-02
              */
@@ -632,7 +632,7 @@ const cm = {
              * 하나 또는 배열 입니다
              * @param   value
              * 하나 또는 배열 입니다
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-04-22
              * @updated 2019-05-02
              */
@@ -659,7 +659,7 @@ const cm = {
              * input 의 이름 또는 이름 배열 입니다
              * @param   value
              * input 의 들어갈 값 또는 값 배열 입니다
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-04-22
              * @updated 2019-05-02
              */
@@ -681,7 +681,7 @@ const cm = {
              * @param   value
              * @param   formSelector
              * @param   validator
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -697,7 +697,7 @@ const cm = {
              * @param   value
              * @param   formSelector
              * @param   validator
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -713,7 +713,7 @@ const cm = {
              * @param   value
              * @param   complete
              * @param   validator
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -728,7 +728,7 @@ const cm = {
              * @param   value
              * @param   complete
              * @param   validator
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -798,7 +798,7 @@ const cm = {
              * @param   selector
              * @param   allowRegs
              * validate.allowReg
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-06-15
              * @updated 2019-06-15
              */
@@ -814,7 +814,7 @@ const cm = {
              * @param   selector
              * @param   limit
              * @return
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-06-15
              * @updated 2019-06-15
              */
@@ -840,7 +840,7 @@ const cm = {
              * @param   releaseCallback: function(selector, message)
              * validation 이 올바를 때 실행합니다
              * @return  Boolean
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-06-15
              * @updated 2019-06-15
              */
@@ -875,7 +875,7 @@ const cm = {
              *
              * @param   validator
              * @return  boolean
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-09
              * @updated 2019-08-09
              */
@@ -948,7 +948,7 @@ const cm = {
              *
              * @param   validators
              * @return  boolean
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-09
              * @updated 2019-08-09
              */
@@ -982,7 +982,7 @@ const cm = {
              * @param   validCallback function(selector, message)
              * validate 가 성공할 경우 실행하는 callback function
              * @return  validator
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-09
              * @updated 2019-08-09
              */
@@ -1011,7 +1011,7 @@ const cm = {
              * @param   validateCallback function(selector, value, invalidCallback, message)
              * @param   validCallback function(selector, message)
              * @return  validator
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-08-27
              * @updated 2019-08-27
              */
@@ -1127,7 +1127,7 @@ const cm = {
              * @param   callback: Function(checked: Boolean, data: String)
              * checked : bool , object 의 data-obj 를 parameter 로 전달합니다
              * @return
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-05-03
              * @updated 2019-05-03
              */
@@ -1164,7 +1164,7 @@ const cm = {
              * @param   event: function()
              * keycode 와 condition 이 true 일 때 실행됩니다
              *
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-06-10
              * @updated 2019-06-10
              */
@@ -1181,7 +1181,7 @@ const cm = {
              *
              * @param   onKeyPressObj
              * @return
-             * @author  TaehyunJeong
+             * @author   WilsonParker
              * @added   2019-06-10
              * @updated 2019-06-10
              */
@@ -1210,7 +1210,7 @@ const cm = {
          *
          * @param   length
          * @return
-         * @author  TaehyunJeong
+         * @author   WilsonParker
          * @added   2019-08-27
          * @updated 2019-08-27
          */

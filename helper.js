@@ -5,7 +5,6 @@
  * @added   2020/08/03
  * @updated 2020/10/15
  */
-
 const helper = {
     /**
      * initialize helper
@@ -92,24 +91,38 @@ const helper = {
          * @return  String | returnCallback
          * @author  WilsonParker
          * @added   2019-05-14
-         * @updated 2019-05-14
+         * @updated 2021-01-14
          */
         forEach: function (collector, callback, resultCallback, carry) {
-            let keys = Object.keys(collector);
-            Object.values = Object.values || this.objectValuesPolyfill;
-            let values = Object.values(collector);
             let idx = 0;
             let result = this.isNonSet(carry) ? "" : carry;
-            keys.forEach(function (element) {
-                let v = values[element] !== undefined ? values[element] : values[idx];
-                if (helper.object.isNonSet(resultCallback)) {
-                    result += callback(element, v, idx, resultCallback, carry);
-                } else {
-                    result = carry;
-                    callback(element, v, idx, resultCallback, carry);
-                }
-                idx++;
-            });
+
+            if (collector instanceof Map) {
+                collector.forEach(function (value, key, map) {
+                    if (helper.object.isNonSet(resultCallback)) {
+                        result += callback(key, value, idx, resultCallback, carry);
+                    } else {
+                        result = carry;
+                        callback(key, value, idx, resultCallback, carry);
+                    }
+                    idx++;
+                });
+            } else if (collector instanceof Object || collector instanceof Array) {
+                let keys = Object.keys(collector);
+                Object.values = Object.values || this.objectValuesPolyfill;
+                let values = Object.values(collector);
+                keys.forEach(function (element) {
+                    let v = values[element] !== undefined ? values[element] : values[idx];
+                    if (helper.object.isNonSet(resultCallback)) {
+                        result += callback(element, v, idx, resultCallback, carry);
+                    } else {
+                        result = carry;
+                        callback(element, v, idx, resultCallback, carry);
+                    }
+                    idx++;
+                });
+            }
+
             return result;
         },
         /**
@@ -349,7 +362,108 @@ const helper = {
         loadAfterTime: function (callback, time) {
             setTimeout(callback, time);
         }
-    }
+    },
+
+    event: {
+        props: {
+            singleCheckMap: undefined,
+            events: undefined,
+        },
+        key: {
+            enter: '13'
+        },
+
+        init: function () {
+            this.props.singleCheckMap = new Map();
+            this.props.events = new Map();
+        },
+
+        /**
+         * input[type='checkbox'] 같이 check 기능을 하나의 object 로만 관리하기 위한 기능 입니다
+         *
+         * @param   key: String
+         * object 를 관리할 key
+         * @param   obj
+         * 클릭한 object
+         * @param   callback: Function(checked: Boolean, data: String)
+         * checked : bool , object 의 data-obj 를 parameter 로 전달합니다
+         * @return
+         * @author  WilsonParker
+         * @added   2019-05-03
+         * @updated 2019-05-03
+         */
+        singleCheck: function (key, obj, callback) {
+            if (!this.props.singleCheckMap.has(key)) {
+                this.props.singleCheckMap.set(key, undefined);
+            }
+            let singleClickObj = this.props.singleCheckMap.get(key);
+            let data = helper.object.getDataObj(obj);
+            if (obj.checked) {
+                if (singleClickObj !== undefined) {
+                    singleClickObj.checked = false;
+                }
+                singleClickObj = obj;
+                callback(obj.checked, data);
+            } else {
+                singleClickObj = undefined;
+                callback(false, data);
+            }
+            this.singleCheckMap.set(key, singleClickObj);
+        },
+
+        /**
+         * event 객체를 생성 합니다
+         *
+         * @param code
+         * key code
+         * @param callback
+         * run when key is pressed
+         * @param validationCallback
+         * @return Object
+         * @author  dew9163
+         * @added   2021/01/14
+         * @updated 2021/01/14
+         */
+        createEvent: function (code, callback, validationCallback) {
+            return {
+                code: code,
+                callback: callback,
+                validationCallback: validationCallback,
+            }
+        },
+
+        /**
+         * event 객체를 등록 합니다
+         * @param   code
+         * @param callback
+         * @param validationCallback
+         * @author  dew9163
+         * @added   2021/01/14
+         * @updated 2021/01/14
+         */
+        addEventListener: function (code, callback, validationCallback) {
+            this.props.events.set(code, this.createEvent(code, callback, validationCallback));
+        },
+
+        /**
+         * 등록한 event 를 설정 합니다
+         * @author  dew9163
+         * @added   2021/01/14
+         * @updated 2021/01/14
+         */
+        listen: function () {
+            let self = this;
+            $(document).keypress(function (e) {
+                let keycode = (e.keyCode ? e.keyCode : e.which);
+                helper.object.forEach(self.props.events, function (key, ele) {
+                    let validated = helper.object.isSet(ele.validationCallback) ? ele.validationCallback() : true;
+                    if (keycode == key && validated) {
+                        ele.callback();
+                    }
+                });
+            });
+        },
+    },
 };
 
 export {helper}
