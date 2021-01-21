@@ -26,8 +26,14 @@ const loading = {
             loading.data.callback();
         })
     },
+    locateUrl: function (url) {
+        let callback = function () {
+            location.href = url;
+        };
+        this.run(callback);
+    },
     run: function (callback) {
-        if(!this.data.isBooted) {
+        if (!this.data.isBooted) {
             loading.initialize();
         }
         this.data.callback = callback;
