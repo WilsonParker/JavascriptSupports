@@ -4,8 +4,8 @@
 
 > Use all
 ```
-git init resources/JavascriptSupports
-cd resources/JavascriptSupports
+git init resources/library/JavascriptSupports
+cd resources/library/JavascriptSupports
 git remote add -f origin https://github.com/WilsonParker/JavascriptSupports.git
 git pull origin master
 ```
