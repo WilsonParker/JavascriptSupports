@@ -7,7 +7,10 @@
  */
 const modal = {
     props: {
-        id: 'componentModal'
+        id: 'componentModal',
+        dismissEvent: function () {
+
+        },
     },
     init: function (id) {
         this.props.id = id;
@@ -41,6 +44,10 @@ const modal = {
         },
         setContent(content) {
             modal.selector.getContentModal().html(content);
+        },
+
+        setDissmissEvent(event) {
+            modal.props.dismissEvent = event;
         },
 
         parse(data) {
