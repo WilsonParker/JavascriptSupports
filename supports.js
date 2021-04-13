@@ -1,5 +1,5 @@
 /**
- * common script
+ * supports script
  *
  * babel public/common/js/babel -d public/common/js -w
  * command 를 사용해서 ie 에도 적용가능한 script 로 compile 해야 합니다
@@ -8,7 +8,7 @@
  * @created 2019-05-31
  * @updated 2019-08-26
  */
-const cm = {
+const supports = {
         /*
          * =====================================================================================================================
          * Object
@@ -124,7 +124,7 @@ const cm = {
                 let result = this.isNonSet(carry) ? "" : carry;
                 keys.forEach(function (element) {
                     let v = values[element] != undefined ? values[element] : values[idx];
-                    if (cm.object.isNonSet(resultCallback)) {
+                    if (supports.object.isNonSet(resultCallback)) {
                         result += callback(element, v, idx, resultCallback, carry);
                     } else {
                         result = carry;
@@ -152,11 +152,11 @@ const cm = {
                 Object.values = Object.values || this.objectValuesPolyfill;
                 let values = Object.values(collector);
                 let result = this.isNonSet(carry) ? "" : carry;
-                let rLength = length == -1 || cm.object.isNonSet(length) ? cm.object.length(collector) : length;
+                let rLength = length == -1 || supports.object.isNonSet(length) ? supports.object.length(collector) : length;
                 for (let idx = 0; idx < rLength; idx++) {
                     let element = keys[idx];
                     let v = values[element] != undefined ? values[element] : values[idx];
-                    if (cm.object.isNonSet(resultCallback)) {
+                    if (supports.object.isNonSet(resultCallback)) {
                         result += callback(element, v, idx, resultCallback, carry);
                     } else {
                         result = carry;
@@ -182,7 +182,7 @@ const cm = {
                 } else if (dataObj.attr != undefined) {
                     data = dataObj.attr('data-obj');
                 }
-                let json = cm.object.replaceAll(data, "\'", "\"");
+                let json = supports.object.replaceAll(data, "\'", "\"");
                 return this.isSet(json) ? JSON.parse(json) : "";
             },
             /**
@@ -213,7 +213,7 @@ const cm = {
              * @updated 2019-08-27
              */
             removeDataObj: function (obj, key) {
-                let data = cm.object.getDataObj(obj);
+                let data = supports.object.getDataObj(obj);
                 delete data[key];
                 return $(obj).attr('data-obj', JSON.stringify(data))[0];
             },
@@ -280,10 +280,10 @@ const cm = {
             buildList: function (selector, list, buildCallback, emptyCallback) {
                 var target = $(selector);
                 var result = "";
-                if (cm.object.isEmptyArray(list)) {
+                if (supports.object.isEmptyArray(list)) {
                     result = emptyCallback();
                 } else {
-                    result = cm.object.forEach(list, buildCallback);
+                    result = supports.object.forEach(list, buildCallback);
                 }
                 $(target).html(result);
             },
@@ -305,9 +305,9 @@ const cm = {
             data: {
                 buildSortChangedList: function (selector, newSortKey = "new_sort") {
                     let sortResultList = [];
-                    cm.object.forEachWithLength($(selector), null, function (element, val, idx) {
-                        cm.object.setDataObj(val, newSortKey, idx + 1);
-                        let data = cm.object.getDataObj(val);
+                    supports.object.forEachWithLength($(selector), null, function (element, val, idx) {
+                        supports.object.setDataObj(val, newSortKey, idx + 1);
+                        let data = supports.object.getDataObj(val);
                         if (data.old_sort != data.new_sort) {
                             sortResultList.push(data);
                         }
@@ -332,14 +332,14 @@ const cm = {
                  */
                 buildDataObjList: function (arr, key) {
                     let resultList = [];
-                    cm.object.forEachWithLength(arr, null, function (element, val, idx) {
-                        var data = cm.object.getDataObj(val);
+                    supports.object.forEachWithLength(arr, null, function (element, val, idx) {
+                        var data = supports.object.getDataObj(val);
 
-                        if (cm.object.isNonSet(key)) {
+                        if (supports.object.isNonSet(key)) {
                             resultList.push(data);
-                        } else if (cm.object.isNonEmptyArray(key)) {
+                        } else if (supports.object.isNonEmptyArray(key)) {
                             resultList.push(
-                                cm.object.forEach(key, function (element, value, idx, resultCallback, carry) {
+                                supports.object.forEach(key, function (element, value, idx, resultCallback, carry) {
 
                                 })
                             );
@@ -367,8 +367,8 @@ const cm = {
                  * @updated 2019-08-19
                  */
                 buildCheckedListData: function (name, callback) {
-                    let fun = cm.object.isFunction(callback) ? callback : function (idx, element) {
-                        return cm.object.getDataObj(element).ix;
+                    let fun = supports.object.isFunction(callback) ? callback : function (idx, element) {
+                        return supports.object.getDataObj(element).ix;
                     };
                     return $("input[name='" + name + "']:checked").map(fun).toArray();
                 }
@@ -407,7 +407,7 @@ const cm = {
                 let frm = $(formSelector);
                 let url = frm.attr("action");
                 let inputs = frm.find("input");
-                let params = inputs.toArray().filter(item => cm.object.isNonEmptyString(item.value));
+                let params = inputs.toArray().filter(item => supports.object.isNonEmptyString(item.value));
                 params = params.map(item => item.name + "=" + item.value);
                 return url + "?" + params.join("&");
             },
@@ -424,11 +424,11 @@ const cm = {
              */
             convertFormToDataObject: function (formSelector) {
                 let frmData = $(formSelector).serialize();
-                let params = frmData.split("&").filter(item => cm.object.isNonEmptyString(item.value));
+                let params = frmData.split("&").filter(item => supports.object.isNonEmptyString(item.value));
                 let returnCallback = function (carry, key, val) {
                     carry[key] = val;
                 };
-                let result = cm.object.forEach(params, function (element, value, idx, returnCallback, carry) {
+                let result = supports.object.forEach(params, function (element, value, idx, returnCallback, carry) {
                     var obj = value.split("=");
                     return returnCallback(carry, obj[0], obj[1])
                 }, returnCallback, {});
@@ -448,11 +448,11 @@ const cm = {
             convertFormInputToDataObject: function (formSelector) {
                 let frm = $(formSelector);
                 let inputs = frm.find("input");
-                let params = inputs.toArray().filter(item => cm.object.isNonEmptyString(item.value));
+                let params = inputs.toArray().filter(item => supports.object.isNonEmptyString(item.value));
                 let returnCallback = function (carry, key, val) {
                     carry[key] = val;
                 };
-                let result = cm.object.forEach(params, function (element, value, idx, returnCallback, carry) {
+                let result = supports.object.forEach(params, function (element, value, idx, returnCallback, carry) {
                     return returnCallback(carry, value.name, value.value)
                 }, returnCallback, {});
                 return result;
@@ -611,7 +611,7 @@ const cm = {
                             'name': name[i],
                             'value': value[i]
                         };
-                        $(formSelector).append(cm.builder.buildInputTagWithOptions(options));
+                        $(formSelector).append(supports.builder.buildInputTagWithOptions(options));
                     }
                 }
                 let options = {
@@ -619,7 +619,7 @@ const cm = {
                     'name': name,
                     'value': value
                 };
-                $(formSelector).append(cm.builder.buildInputTagWithOptions(options));
+                $(formSelector).append(supports.builder.buildInputTagWithOptions(options));
                 $(formSelector).submit();
             },
 
@@ -639,13 +639,13 @@ const cm = {
             setInputValue: function (selector, value, validator) {
                 let success = true;
                 if (Array.isArray(selector)) {
-                    cm.object.forEach(selector, function (idx, item) {
+                    supports.object.forEach(selector, function (idx, item) {
                         $(item).val(value[idx]);
-                        if (cm.object.isSet(validator))
+                        if (supports.object.isSet(validator))
                             success &= validator($(item), value[idx]);
                     });
                 } else {
-                    if (cm.object.isSet(validator))
+                    if (supports.object.isSet(validator))
                         success &= validator($(selector), value);
                     $(selector).val(value);
                 }
@@ -667,7 +667,7 @@ const cm = {
                 const converter = function (name) {
                     return `input[name='${name}']`;
                 };
-                if (cm.object.isNonEmptyArray(name)) {
+                if (supports.object.isNonEmptyArray(name)) {
                     return this.setInputValue(name.map(converter), value, validator);
                 } else {
                     return this.setInputValue(converter(name), value, validator);
@@ -882,45 +882,45 @@ const cm = {
             validate: function (validator) {
                 let commonValidate = function (validator, value) {
                     let result = false;
-                    if (validator.nullable && cm.object.isEmpty(value)) {
+                    if (validator.nullable && supports.object.isEmpty(value)) {
                         result = true;
-                    } else if (cm.object.isEmpty(value)) {
+                    } else if (supports.object.isEmpty(value)) {
                         validator.invalidCallback(validator.selector, validator.nullMessage);
                         result = false;
-                    } else if (cm.object.isSet(validator.reg) && !value.match(validator.reg)) {
+                    } else if (supports.object.isSet(validator.reg) && !value.match(validator.reg)) {
                         validator.invalidCallback(validator.selector, validator.message);
                         result = false;
-                    } else if (cm.object.isSet(validator.validateCallback)) {
+                    } else if (supports.object.isSet(validator.validateCallback)) {
                         result = validator.validateCallback(validator.selector, value, validator.invalidCallback, validator.message);
                     } else {
                         result = true;
                     }
-                    if (result && cm.object.isSet(validator.validCallback)) {
+                    if (result && supports.object.isSet(validator.validCallback)) {
                         validator.validCallback(validator.selector, validator.message);
                     }
                     return result;
                 };
 
-                if (cm.object.isSet(validator.type) && validator.type == cm.validation.validatorType.fileValidator) {
+                if (supports.object.isSet(validator.type) && validator.type == supports.validation.validatorType.fileValidator) {
                     let files = $(validator.selector).prop("files");
                     if (validator.nullable && files.length == 0) {
                         return true;
                     } else if (!validator.nullable && files.length == 0) {
                         validator.invalidCallback(validator.selector, validator.nullMessage);
                         return false;
-                    } else if (cm.object.isEmpty(files[0].name)) {
+                    } else if (supports.object.isEmpty(files[0].name)) {
                         validator.invalidCallback(validator.selector, validator.nullMessage);
                         return false;
-                    } else if (!cm.object.isEmpty(validator.mimeType) && validator.mimeType.indexOf(files[0].type) == "-1") {
+                    } else if (!supports.object.isEmpty(validator.mimeType) && validator.mimeType.indexOf(files[0].type) == "-1") {
                         validator.invalidCallback(validator.selector, validator.message);
                         return false;
                     } else {
                         return true;
                     }
-                } else if (cm.object.isSet(validator.type) && validator.type == cm.validation.validatorType.editorValidator) {
+                } else if (supports.object.isSet(validator.type) && validator.type == supports.validation.validatorType.editorValidator) {
                     let _value = validator.valueCallback().replace(/<(\/)?([a-zA-Z]*)(\s[a-zA-Z]*=[^>]*)?(\s)*(\/)?>/ig, "");
                     return commonValidate(validator, _value);
-                } else if (cm.object.isSet(validator.type) && validator.type == cm.validation.validatorType.dateValidator) {
+                } else if (supports.object.isSet(validator.type) && validator.type == supports.validation.validatorType.dateValidator) {
                     let date_val = $(validator.selector).val();
                     let now = new Date();
                     let year = now.getFullYear();
@@ -953,9 +953,9 @@ const cm = {
              * @updated 2019-08-09
              */
             validates: function (validators) {
-                for (let i = 0; i < cm.object.length(validators); i++) {
+                for (let i = 0; i < supports.object.length(validators); i++) {
                     let validator = validators[i];
-                    let validateResult = cm.validation.validate(validator);
+                    let validateResult = supports.validation.validate(validator);
                     if (!validateResult)
                         return false;
                 }
@@ -1016,7 +1016,7 @@ const cm = {
              * @updated 2019-08-27
              */
             makeValidatorWithName: function (name, reg, message, nullable, nullMessage, invalidCallback, validateCallback, validCallback) {
-                return cm.validation.makeValidator("input[name='" + name + "']", reg, message, nullable, nullMessage, invalidCallback, validateCallback, validCallback);
+                return supports.validation.makeValidator("input[name='" + name + "']", reg, message, nullable, nullMessage, invalidCallback, validateCallback, validCallback);
             },
 
             /**
@@ -1035,7 +1035,7 @@ const cm = {
              */
             makeFileValidator: function (selector, mimeType, message, nullable, nullMessage, invalidCallback) {
                 return {
-                    type: cm.validation.validatorType.fileValidator,
+                    type: supports.validation.validatorType.fileValidator,
                     selector: selector,
                     mimeType: mimeType,
                     message: message,
@@ -1058,7 +1058,7 @@ const cm = {
              */
             makeEditorValueValidator: function makeValueValidator(valueCallback, nullable, nullMessage, invalidCallback) {
                 return {
-                    type: cm.validation.validatorType.editorValidator,
+                    type: supports.validation.validatorType.editorValidator,
                     valueCallback: valueCallback,
                     nullable: nullable,
                     nullMessage: nullMessage,
@@ -1082,7 +1082,7 @@ const cm = {
              */
             makeDateValidator: function (selector, condition, message, nullable, nullMessage, invalidCallback) {
                 return {
-                    type: cm.validation.validatorType.dateValidator,
+                    type: supports.validation.validatorType.dateValidator,
                     selector: selector,
                     condition: condition,
                     message: message,
@@ -1138,7 +1138,7 @@ const cm = {
                         this.singleCheckMap.set(key, undefined);
                     }
                     let singleClickObj = this.singleCheckMap.get(key);
-                    let data = cm.object.getDataObj(obj);
+                    let data = supports.object.getDataObj(obj);
                     if (obj.checked) {
                         if (singleClickObj != undefined) {
                             singleClickObj.checked = false;
@@ -1188,7 +1188,7 @@ const cm = {
             onKeypress: function (onKeyPressObj) {
                 $(document).keypress(function (e) {
                     let keycode = (e.keyCode ? e.keyCode : e.which);
-                    cm.object.forEach(onKeyPressObj, function (key, ele) {
+                    supports.object.forEach(onKeyPressObj, function (key, ele) {
                         if (keycode == ele.code && ele.condition()) {
                             ele.event();
                         }
@@ -1201,6 +1201,32 @@ const cm = {
         /*
          * =====================================================================================================================
          * Event
+         * END
+         * =====================================================================================================================
+         */
+
+        /*
+         * =====================================================================================================================
+         * Window
+         * START
+         * =====================================================================================================================
+         */
+        window: {
+            /**
+             * 새로운 창을 url 로 이동 시킵니다
+             *
+             * @param   url string
+             * @author  dew9163
+             * @added   2021/04/13
+             * @updated 2021/04/13
+             */
+            open: function (url) {
+                window.open(url, '_blank');
+            },
+        },
+        /*
+         * =====================================================================================================================
+         * window
          * END
          * =====================================================================================================================
          */
@@ -1228,3 +1254,5 @@ const cm = {
         }
     }
 ;
+
+export {supports}
