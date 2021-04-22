@@ -10,6 +10,10 @@ const modelBuilder = {
         getModel: function (selector, value = undefined, key = 'data-id') {
             return value !== undefined ? $(`${selector}[${key}=${value}]`) : $(`${selector}`);
         },
+        getModelWithMap: function (selector, map) {
+            let attr = Object.keys(map).map(key => `[${key}="${map[key]}"]`).join("");
+            return map !== undefined ? $(`${selector}${attr}`) : $(`${selector}`);
+        },
         getModelItem: function (model, name, attr = 'data-name') {
             return $(model[0].querySelector(`[${attr}=${name}]`));
         },
@@ -49,13 +53,16 @@ const modelBuilder = {
         },
 
         getDataID: function (model) {
-            return $(model).attr('data-id');
+            return this.getDataAttribute(model, 'data-id');
         },
         getDataName: function (model) {
-            return $(model).attr('data-name');
+            return this.getDataAttribute(model, 'data-name');
         },
         getDataNumber: function (model) {
-            return $(model).attr('data-number');
+            return this.getDataAttribute(model, 'data-number');
+        },
+        getDataAttribute: function (model, attr) {
+            return $(model).attr(attr);
         },
     },
 
