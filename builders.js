@@ -52,10 +52,9 @@ const builders = {
             this.setBuildOptionTagCallback(buildOptionTagCallback);
             this.setBuildCheckBoxTagCallback(buildCheckBoxTagCallback);
             this.setName(name);
-
             this.builder.init(this);
-            this.listener.init(this);
             this.event.init(this);
+            this.listener.init(this);
         },
         newInstance: function (buildOptionTagCallback, buildCheckBoxTagCallback, name) {
             let instance = _.cloneDeep(this);
@@ -97,7 +96,7 @@ const builders = {
                 let instanceID = this.parent.getCount();
                 let sectionID = this.getSectionCount();
                 let html = `
-                <form id="${this.parent.getIDs().form}_${instanceID}">
+                <form class="${this.parent.getClasses().form}" data-instance-id="${instanceID}">
                 <div class="${this.parent.getClasses().sectionContainer}" data-name="${this.parent.getDataNames().sectionContainer}" data-instance-id="${instanceID}" data-id="${sectionID}">
                         <div class="row">
                             <div class="col-3">`;
@@ -207,7 +206,7 @@ const builders = {
                 let id = `${this.parent.getName()}_${instanceID}_${sectionID}_${this.getCheckBoxCount()}`;
                 return `
                 <div class="col-3">
-                    <input type="checkbox" id="${id}" name="${this.parent.getName()}" class="form-check-input ${classes}" value="${value}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
+                    <input type="checkbox" id="${id}" name="${this.parent.getName()}" class="form-check-input ${this.parent.getClasses().checkbox} ${classes}" value="${value}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
                     <label class="form-check-label" for="${id}">${text}</label>
                 </div>
                 `;
@@ -219,7 +218,7 @@ const builders = {
                 let html = '';
                 this.setCheckBoxCount(1);
 
-                html += this.buildCheckBoxTagParams(instanceID, sectionID, $(select).val(), '모두', this.parent.getClasses().checkboxAll);
+                html += this.buildCheckBoxTagParams(instanceID, sectionID, $(select).val(), '전체', this.parent.getClasses().checkboxAll);
                 self.addCheckBoxCount();
                 helper.object.forEach(JSON.parse(data), function (element, value, idx, resultCallback, carry) {
                     html += self.parent.callback.buildCheckBoxTagCallback(instanceID, sectionID, value);
@@ -278,7 +277,7 @@ const builders = {
             },
             selectChangeListener: function () {
                 let self = this;
-                $('.' + this.getParent().getClasses().select).on('change', function () {
+                $(`.${this.getParent().getClasses().select}[data-instance-id="${this.getParent().getCount()}"]`).on('change', function () {
                     let selectedOption = $(this).children("option:selected")[0];
                     let data = modelBuilder.attribute.getDataAttribute($(selectedOption), 'data-items');
                     self.parent.builder.appendCheckBoxTag(this, data)
@@ -287,21 +286,22 @@ const builders = {
             checkBoxCheckedListener: function () {
                 let self = this;
                 $('.' + this.getParent().getClasses().checkboxAll).on('click', function () {
-                    let containerID = modelBuilder.attribute.getDataAttribute(this, 'data-id');
-                    let checkboxes = $(`div[data-name=${self.parent.getDataNames().checkBoxContainer}][data-id="${containerID}"]`).find(':checkbox');
+                    let containerID = modelBuilder.attribute.getDataAttribute(this, 'data-instance-id');
+                    let sectionID = modelBuilder.attribute.getDataAttribute(this, 'data-section-id');
+                    let checkboxes = $(`div[data-name=${self.parent.getDataNames().checkBoxContainer}][data-instance-id="${containerID}"][data-section-id="${sectionID}"]`).find(':checkbox');
                     checkboxes.prop('checked', this.checked);
                 });
             },
             addButtonClickListener: function () {
                 let self = this;
-                $(`.${this.getParent().getClasses().addButton}`).on('click', function () {
+                $(`.${this.getParent().getClasses().addButton}[data-instance-id="${this.getParent().getCount()}"]`).on('click', function () {
                     let instanceID = modelBuilder.attribute.getDataAttribute(this, 'data-instance-id');
                     self.parent.event.addButtonClickEvent(instanceID);
                 });
             },
             deleteButtonClickListener: function () {
                 let self = this;
-                $(`.${this.getParent().getClasses().deleteButton}`).on('click', function () {
+                $(`.${this.getParent().getClasses().deleteButton}[data-instance-id="${this.getParent().getCount()}"`).on('click', function () {
                     let instanceID = modelBuilder.attribute.getDataAttribute(this, 'data-instance-id');
                     let sectionID = modelBuilder.attribute.getDataAttribute(this, 'data-section-id');
                     self.parent.event.deleteButtonClickEvent(instanceID, sectionID);
@@ -309,7 +309,7 @@ const builders = {
             },
 
             getParent: function () {
-                return builders.selectWithCheckBox;
+                return this.parent;
             }
         },
         event: {
@@ -350,7 +350,33 @@ const builders = {
             return this.data.name;
         },
         getFormData: function () {
-            return $(`#${this.getIDs().form}`).serialize();
+            return $(`.${this.getClasses().form}[data-instance-id="${this.getCount()}"]`).serialize();
+        },
+        getAllSelectData: function () {
+            return helper.object.forEach($(`.${this.getClasses().select}[data-instance-id="${this.getCount()}"]`), function (element, value, idx, resultCallback, carry) {
+                if (typeof value === 'object') {
+                    let val = $(value).val();
+                    if (val !== '') {
+                        resultCallback($(value).val(), carry);
+                    }
+                }
+            }, function (val, carry) {
+                carry.push(val);
+                return carry;
+            }, []);
+        },
+        getAllCheckBoxData: function () {
+            return helper.object.forEach($(`.${this.getClasses().checkbox}[data-instance-id="${this.getCount()}"]:checked`), function (element, value, idx, resultCallback, carry) {
+                if (typeof value === 'object') {
+                    let val = $(value).val();
+                    if (val !== '') {
+                        resultCallback($(value).val(), carry);
+                    }
+                }
+            }, function (val, carry) {
+                carry.push(val);
+                return carry;
+            }, []);
         },
 
         setJsonData: function (json) {
