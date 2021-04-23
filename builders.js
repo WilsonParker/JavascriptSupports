@@ -158,7 +158,7 @@ const builders = {
             buildSelectTag: function (instanceID, sectionID) {
                 let html = `
                 <select class="custom-select ${this.parent.getClasses().select}" data-name="${this.parent.getDataNames().select}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
-                    <option value="">전체</option>
+                    <option value="" data-items="[]">전체</option>
                 `;
 
                 let self = this;
