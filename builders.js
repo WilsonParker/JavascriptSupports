@@ -124,19 +124,21 @@ const builders = {
                     `;
                 html += this.buildSelectTag(instanceID, sectionID);
                 html += `</div>`;
+                html += this.buildDeleteButtonTag(instanceID, sectionID);
                 html += `
+                </div>
+                <br/>
+                <div class="row">
                     <div class="col-lg">
                         <div class="container">
                             <div class="row" data-name="${this.parent.getDataNames().checkBoxContainer}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
                             </div>
                         </div>
                     </div>
+                </div>
+                <hr/>
                 `;
-                html += this.buildDeleteButtonTag(instanceID, sectionID);
                 html += `
-                    <br/>
-                    <br/>
-                    <br/>
                     <br/>
                 `;
                 this.addSectionCount();
