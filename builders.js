@@ -30,6 +30,19 @@ const builders = {
                 checkBoxContainer: 'checkbox-container',
             },
         },
+        data: {
+            name: undefined,
+            id: undefined,
+            json: undefined,
+            count: 1,
+            additionalCheckBoxColClass: undefined,
+            additionalCheckBoxClass: undefined,
+            additionalCheckBoxLabelClass: undefined,
+        },
+        callback: {
+            buildOptionTagCallback: undefined,
+            buildCheckBoxTagCallback: undefined,
+        },
         /**
          *
          * @param   buildOptionTagCallback
@@ -56,9 +69,12 @@ const builders = {
             this.event.init(this);
             this.listener.init(this);
         },
-        newInstance: function (buildOptionTagCallback, buildCheckBoxTagCallback, name) {
+        newInstance: function (buildOptionTagCallback, buildCheckBoxTagCallback, name, applyCallback = undefined) {
             let instance = _.cloneDeep(this);
             instance.setCount(this.getCount());
+            if (helper.object.isCallable(applyCallback)) {
+                applyCallback(instance);
+            }
             instance.init(buildOptionTagCallback, buildCheckBoxTagCallback, name);
             this.addCount();
             return instance;
@@ -67,16 +83,6 @@ const builders = {
             this.listener.addButtonClickListener();
             this.listener.deleteButtonClickListener();
             this.listener.selectChangeListener();
-        },
-        data: {
-            name: undefined,
-            id: undefined,
-            json: undefined,
-            count: 1,
-        },
-        callback: {
-            buildOptionTagCallback: undefined,
-            buildCheckBoxTagCallback: undefined,
         },
         builder: {
             parent: undefined,
@@ -139,6 +145,7 @@ const builders = {
                 <hr/>
                 `;
                 html += `
+                    </div>
                     <br/>
                 `;
                 this.addSectionCount();
@@ -159,7 +166,7 @@ const builders = {
             buildSelectTag: function (instanceID, sectionID) {
                 let html = `
                 <select class="custom-select ${this.parent.getClasses().select}" data-name="${this.parent.getDataNames().select}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
-                    <option value="" data-items="[]">전체</option>
+                    <option value="" data-items="[]">선택</option>
                 `;
 
                 let self = this;
@@ -207,12 +214,26 @@ const builders = {
             buildCheckBoxTag: function (instanceID, sectionID, value, text, classes = "") {
                 let id = `${this.parent.getName()}_${instanceID}_${sectionID}_${this.getCheckBoxCount()}`;
                 return `
-                <div class="col-3">
-                    <input type="checkbox" id="${id}" name="${this.parent.getName()}" class="form-check-input ${this.parent.getClasses().checkbox} ${classes}" value="${value}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
-                    <label class="form-check-label" for="${id}">${text}</label>
+                <div class="col-3 ${this.parent.getAdditionalCheckBoxColClass()}">
+                    <input type="checkbox" id="${id}" name="${this.parent.getName()}" class="form-check-input ${this.parent.getClasses().checkbox} ${classes} ${this.parent.getAdditionalCheckBoxClass()}" value="${value}" data-instance-id="${instanceID}" data-section-id="${sectionID}">
+                    <label class="form-check-label ${this.parent.getAdditionalCheckBoxLabelClass()}" for="${id}">${text}</label>
                 </div>
                 `;
             },
+            /**
+             * data-name : dataNames.checkBoxContainer
+             * data-instance-id
+             * data-select-id
+             * 에 해당하는 selector 에 checkbox tag 를 append 합니다
+             *
+             * @param   select
+             * select tag
+             * @param   data
+             * checkbox 를 생성할 data
+             * @author  dew9163
+             * @added   2021/04/26
+             * @updated 2021/04/26
+             */
             appendCheckBoxTag: function (select, data) {
                 let self = this;
                 let instanceID = modelBuilder.attribute.getDataAttribute(select, 'data-instance-id');
@@ -220,8 +241,8 @@ const builders = {
                 let html = '';
                 this.setCheckBoxCount(1);
 
-                html += this.buildCheckBoxTagParams(instanceID, sectionID, $(select).val(), '전체', this.parent.getClasses().checkboxAll);
-                self.addCheckBoxCount();
+                // html += this.buildCheckBoxTagParams(instanceID, sectionID, $(select).val(), '전체', this.parent.getClasses().checkboxAll);
+                // self.addCheckBoxCount();
                 helper.object.forEach(JSON.parse(data), function (element, value, idx, resultCallback, carry) {
                     html += self.parent.callback.buildCheckBoxTagCallback(instanceID, sectionID, value);
                     self.addCheckBoxCount();
@@ -354,6 +375,15 @@ const builders = {
         getFormData: function () {
             return $(`.${this.getClasses().form}[data-instance-id="${this.getCount()}"]`).serialize();
         },
+        getAdditionalCheckBoxColClass: function () {
+            return this.data.additionalCheckBoxColClass
+        },
+        getAdditionalCheckBoxClass: function () {
+            return this.data.additionalCheckBoxClass
+        },
+        getAdditionalCheckBoxLabelClass: function () {
+            return this.data.additionalCheckBoxLabelClass
+        },
         getAllSelectData: function () {
             return helper.object.forEach($(`.${this.getClasses().select}[data-instance-id="${this.getCount()}"]`), function (element, value, idx, resultCallback, carry) {
                 if (typeof value === 'object') {
@@ -398,6 +428,15 @@ const builders = {
         },
         setBuildCheckBoxTagCallback: function (callback) {
             this.callback.buildCheckBoxTagCallback = callback;
+        },
+        setAdditionalCheckBoxColClass: function (additionalCheckBoxColClass) {
+            return this.data.additionalCheckBoxColClass = additionalCheckBoxColClass;
+        },
+        setAdditionalCheckBoxClass: function (additionalCheckBoxClass) {
+            return this.data.additionalCheckBoxClass = additionalCheckBoxClass;
+        },
+        setAdditionalCheckBoxLabelClass: function (additionalCheckBoxLabelClass) {
+            return this.data.additionalCheckBoxLabelClass = additionalCheckBoxLabelClass;
         },
 
         addCount: function (num = 1) {

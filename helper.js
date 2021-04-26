@@ -78,6 +78,9 @@ const helper = {
         isFunction: function (functionToCheck) {
             return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
         },
+        isCallable: function (obj) {
+            return obj instanceof Function;
+        },
 
         /**
          * collector 를 forEach 하면서 callback 을 실행시킵니다
@@ -357,6 +360,366 @@ const helper = {
             return this.buildQueryString(params);
         },
     },
+
+    /*
+         * =====================================================================================================================
+         * VALIDATE
+         *
+         *
+         *
+         * START
+         * =====================================================================================================================
+         */
+    validation: {
+        // 입력을 허용할 regex 입니다
+        allowReg: {
+            // 숫자
+            number: /[^0-9]/g
+            // 한글
+            , kor: /[^가-힣]/g
+            , eng: /[^a-z]/gi
+            // 특수문자
+            , char: /[^`~!@#$%^&*|\\\'\";:\/?]/gi
+            , numberAndKor: /[^0-9가-힣]/g
+            , numberAndEng: /[^0-9a-zA-Z]/g
+            , numberAndKorAndEng: /[^0-9가-힣a-zA-Z]/g
+            , numberAndKorAndEngAndChar: /[^0-9가-힣a-zA-Z^`~!@#$%^&*|\\\'\";:\/?]/g
+            , numberAndEngAndChar: /[^0-9a-zA-Z^`~!@#$%^&*|\\\'\";:\/?]/g
+        },
+        reg: {
+            number: /[0-9]/g
+            // , numberAndEng: /[0-9a-z]/g
+            , kor: /[가-힣]/g
+            , eng: /[a-z]/gi
+            , char: /[`~!@#$%^&*|\\\'\";:\/?]/gi
+            , email: /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
+            , phone: /^\d{2,3}-\d{3,4}-\d{4}$/
+            , id: /[a-z0-9_]{4,16}/gi
+            , password: /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/
+            , url: /^(file|gopher|news|nntp|telnet|https?|ftps?|sftp):\/\/([a-z0-9-]+\.)+[a-z0-9]{2,4}.*$/
+            // , htmlTag : /\\<(/?[^\\>]+)\\>/
+            , image: /([^\s]+(?=\.(jpg|gif|png))\.\2)/
+        },
+        validatorType: {
+            validator: "validator",
+            fileValidator: "fileValidator",
+            editorValidator: "editorValidator",
+            dateValidator: "dateValidator"
+        },
+
+        /**
+         * selector 에 올바른 값만 입력되도록 설정합니다
+         *
+         * @param   selector
+         * @param   allowReg
+         * validate.allowReg
+         * @author   WilsonParker
+         * @added   2019-06-15
+         * @updated 2019-06-15
+         */
+        allowInput: function (selector, allowReg) {
+            $(selector).on("input", function () {
+                let v = $(this).val();
+                $(this).val(this.replace(v, allowReg));
+            });
+        },
+
+        replace: function (value, reg, replace = '') {
+            return value.replace(reg, replace);
+        },
+
+        /**
+         * selector 의 입력 length 가 limit 을 넘지 않도록 합니다
+         *
+         * @param   selector
+         * @param   limit
+         * @return
+         * @author   WilsonParker
+         * @added   2019-06-15
+         * @updated 2019-06-15
+         */
+        limitInput: function (selector, limit) {
+            $(selector).on("input", function () {
+                let v = $(this).val();
+                if (v.length > limit)
+                    $(this).val(v.substr(0, limit));
+            });
+        },
+
+        match: function (val, reg) {
+            return val.match(reg)
+        },
+
+        /**
+         * Password Validation check 를 하는 기본적인 Function 입니다
+         *
+         * @param   passwordSelector
+         * @param   passwordCheckSelector
+         * @param   warningCallback: function(selector, message)
+         * validation 이 올바르지 않을 때 실행 합니다
+         * @param   releaseCallback: function(selector, message)
+         * validation 이 올바를 때 실행합니다
+         * @return  Boolean
+         * @author   WilsonParker
+         * @added   2019-06-15
+         * @updated 2019-06-15
+         */
+        checkPassword: function (passwordSelector, passwordCheckSelector, warningCallback, releaseCallback) {
+            let password = $(passwordSelector).val();
+            let num = password.search(this.reg.number);
+            let eng = password.search(this.reg.eng);
+            let spe = password.search(this.reg.char);
+
+            if (password.length < 9 || password.length > 20) {
+                warningCallback(passwordSelector, "비밀번호는 9자리 ~ 20자리 이내로 입력해주세요.");
+                return false;
+            } else {
+                releaseCallback(passwordSelector);
+            }
+            if ((num < 0 && eng < 0) || (eng < 0 && spe < 0) || (spe < 0 && num < 0)) {
+                warningCallback(passwordSelector, "영어, 숫자, 특수문자중 2가지 이상을 혼합아여 입력해 주세요.");
+                return false;
+            } else {
+                releaseCallback(passwordSelector);
+            }
+
+            if (password != $(passwordCheckSelector).val()) {
+                mm.form.alert(passwordCheckSelector, "비밀번호가 일치하지 않습니다.");
+                return false;
+            }
+            return true;
+        },
+
+        /**
+         * selector 의 값을 빈 값과 reg 로 확인하여 callback 함수에 selector, message 를 전달하여 실행합니다
+         *
+         * @param   validator
+         * @return  boolean
+         * @author   WilsonParker
+         * @added   2019-08-09
+         * @updated 2019-08-09
+         */
+        validate: function (validator) {
+            let commonValidate = function (validator, value) {
+                let result = false;
+                if (validator.nullable && supports.object.isEmpty(value)) {
+                    result = true;
+                } else if (supports.object.isEmpty(value)) {
+                    validator.invalidCallback(validator.selector, validator.nullMessage);
+                    result = false;
+                } else if (supports.object.isSet(validator.reg) && !value.match(validator.reg)) {
+                    validator.invalidCallback(validator.selector, validator.message);
+                    result = false;
+                } else if (supports.object.isSet(validator.validateCallback)) {
+                    result = validator.validateCallback(validator.selector, value, validator.invalidCallback, validator.message);
+                } else {
+                    result = true;
+                }
+                if (result && supports.object.isSet(validator.validCallback)) {
+                    validator.validCallback(validator.selector, validator.message);
+                }
+                return result;
+            };
+
+            if (supports.object.isSet(validator.type) && validator.type == supports.validation.validatorType.fileValidator) {
+                let files = $(validator.selector).prop("files");
+                if (validator.nullable && files.length == 0) {
+                    return true;
+                } else if (!validator.nullable && files.length == 0) {
+                    validator.invalidCallback(validator.selector, validator.nullMessage);
+                    return false;
+                } else if (supports.object.isEmpty(files[0].name)) {
+                    validator.invalidCallback(validator.selector, validator.nullMessage);
+                    return false;
+                } else if (!supports.object.isEmpty(validator.mimeType) && validator.mimeType.indexOf(files[0].type) == "-1") {
+                    validator.invalidCallback(validator.selector, validator.message);
+                    return false;
+                } else {
+                    return true;
+                }
+            } else if (supports.object.isSet(validator.type) && validator.type == supports.validation.validatorType.editorValidator) {
+                let _value = validator.valueCallback().replace(/<(\/)?([a-zA-Z]*)(\s[a-zA-Z]*=[^>]*)?(\s)*(\/)?>/ig, "");
+                return commonValidate(validator, _value);
+            } else if (supports.object.isSet(validator.type) && validator.type == supports.validation.validatorType.dateValidator) {
+                let date_val = $(validator.selector).val();
+                let now = new Date();
+                let year = now.getFullYear();
+                let mon = (now.getMonth() + 1) > 9 ? '' + (now.getMonth() + 1) : '0' + (now.getMonth() + 1);
+                let day = now.getDate() > 9 ? '' + now.getDate() : '0' + now.getDate();
+                let today_date = year + "-" + mon + "-" + day;
+
+                let commonResult = commonValidate(validator, date_val);
+                if (!commonResult)
+                    return false;
+                else if (validator.condition == "today" && today_date >= date_val) {
+                    validator.invalidCallback(validator.selector, validator.message);
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                let value = $(validator.selector).val();
+                return commonValidate(validator, value);
+            }
+        },
+
+        /**
+         * 하나 이상의 validate 를 처리할 때 사용합니다
+         *
+         * @param   validators
+         * @return  boolean
+         * @author   WilsonParker
+         * @added   2019-08-09
+         * @updated 2019-08-09
+         */
+        validates: function (validators) {
+            for (let i = 0; i < supports.object.length(validators); i++) {
+                let validator = validators[i];
+                let validateResult = supports.validation.validate(validator);
+                if (!validateResult)
+                    return false;
+            }
+            return true;
+        },
+
+        /**
+         * validator obj 를 생성합니다
+         *
+         * @param   selector
+         * @param   reg
+         * 정규식 체크에 필요한 값
+         * @param   message
+         * reg 검증 후 결과가 올바르지 않았을 때 전달할 message
+         * @param   nullable
+         * null 가능 여부
+         * true | false
+         * @param   nullMessage
+         * nullable 검증 후 결과가 올바르지 않았을 때 전달할 message
+         * @param   invalidCallback function(selector, message)
+         * validate 가 무효할 경우 실행하는 callback function
+         * @param   validateCallback function(selector, value, invalidCallback, message)
+         * validate 를 직접 실행할 callback function*
+         * @param   validCallback function(selector, message)
+         * validate 가 성공할 경우 실행하는 callback function
+         * @return  validator
+         * @author   WilsonParker
+         * @added   2019-08-09
+         * @updated 2019-08-09
+         */
+        makeValidator: function (selector, reg, message, nullable, nullMessage, invalidCallback, validateCallback, validCallback) {
+            return {
+                selector: selector,
+                reg: reg,
+                message: message,
+                nullable: nullable,
+                nullMessage: nullMessage,
+                invalidCallback: invalidCallback,
+                validateCallback: validateCallback,
+                validCallback: validCallback,
+            }
+        },
+
+        /**
+         * selector 대신 input[name] 을 사용하여 makeValidator 함수를 실행합니다
+         *
+         * @param   name
+         * @param   reg
+         * @param   message
+         * @param   nullable
+         * @param   nullMessage
+         * @param   invalidCallback function(selector, message)
+         * @param   validateCallback function(selector, value, invalidCallback, message)
+         * @param   validCallback function(selector, message)
+         * @return  validator
+         * @author   WilsonParker
+         * @added   2019-08-27
+         * @updated 2019-08-27
+         */
+        makeValidatorWithName: function (name, reg, message, nullable, nullMessage, invalidCallback, validateCallback, validCallback) {
+            return supports.validation.makeValidator("input[name='" + name + "']", reg, message, nullable, nullMessage, invalidCallback, validateCallback, validCallback);
+        },
+
+        /**
+         *
+         * fileValidator obj 를 생성합니다
+         * @param selector
+         * @param mimeType
+         * @param message
+         * @param nullable
+         * @param nullMessage
+         * @param invalidCallback
+         * @return validator
+         * @author 오세현
+         * @added   2019-08-12
+         * @updated 2019-08-12
+         */
+        makeFileValidator: function (selector, mimeType, message, nullable, nullMessage, invalidCallback) {
+            return {
+                type: supports.validation.validatorType.fileValidator,
+                selector: selector,
+                mimeType: mimeType,
+                message: message,
+                nullable: nullable,
+                nullMessage: nullMessage,
+                invalidCallback: invalidCallback,
+            };
+        },
+
+        /**
+         * Editor 값을 체크하는 validator
+         * @param valueCallback
+         * @param nullable
+         * @param nullMessage
+         * @param invalidCallback
+         * @return  validator
+         * @author  오세현
+         * @added   2019-08-19
+         * @updated 2019-08-19
+         */
+        makeEditorValueValidator: function makeValueValidator(valueCallback, nullable, nullMessage, invalidCallback) {
+            return {
+                type: supports.validation.validatorType.editorValidator,
+                valueCallback: valueCallback,
+                nullable: nullable,
+                nullMessage: nullMessage,
+                invalidCallback: invalidCallback,
+            }
+        },
+
+        /**
+         *
+         * fileValidator obj 를 생성합니다
+         * @param selector
+         * @param condition
+         * @param message
+         * @param nullable
+         * @param nullMessage
+         * @param invalidCallback
+         * @return validator
+         * @author 오세현
+         * @added   2019-08-12
+         * @updated 2019-08-12
+         */
+        makeDateValidator: function (selector, condition, message, nullable, nullMessage, invalidCallback) {
+            return {
+                type: supports.validation.validatorType.dateValidator,
+                selector: selector,
+                condition: condition,
+                message: message,
+                nullable: nullable,
+                nullMessage: nullMessage,
+                invalidCallback: invalidCallback,
+            };
+        },
+
+
+    },
+    /*
+     * =====================================================================================================================
+     * VALIDATE
+     * END
+     * =====================================================================================================================
+     */
 
     time: {
         loadAfterTime: function (callback, time) {

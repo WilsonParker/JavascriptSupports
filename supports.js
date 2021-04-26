@@ -796,7 +796,7 @@ const supports = {
              * selector 에 올바른 값만 입력되도록 설정합니다
              *
              * @param   selector
-             * @param   allowRegs
+             * @param   allowReg
              * validate.allowReg
              * @author   WilsonParker
              * @added   2019-06-15
