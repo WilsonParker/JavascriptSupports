@@ -938,7 +938,15 @@ const supports = {
                         return true;
                     }
                 } else {
-                    let value = $(validator.selector).val();
+                    let selector = $(validator.selector);
+                    let value = undefined;
+                    if (selector.length > 1) {
+                        value = selector.map(function () {
+                            return $(this).val();
+                        }).get();
+                    } else {
+                        value = selector.val();
+                    }
                     return commonValidate(validator, value);
                 }
             },
