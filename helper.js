@@ -827,6 +827,53 @@ const helper = {
             });
         },
     },
+
+    frame: {
+        /**
+         * iframe 의 url 이 변경될 때 callback 을 실행합니다
+         *
+         * @param   iframe
+         * @param   callback
+         * function(newURL)
+         * @author  dev9163
+         * @added   2021/11/25
+         * @updated 2021/11/25
+         */
+        iframeURLChange: function (iframe, callback) {
+            let lastDispatched = null;
+
+            let dispatchChange = function () {
+                let newHref = iframe.contentWindow.location.href;
+
+                if (newHref !== lastDispatched) {
+                    callback(newHref);
+                    lastDispatched = newHref;
+                }
+            };
+
+            let unloadHandler = function () {
+                // Timeout needed because the URL changes immediately after
+                // the `unload` event is dispatched.
+                setTimeout(dispatchChange, 0);
+            };
+
+            function attachUnload() {
+                // Remove the unloadHandler in case it was already attached.
+                // Otherwise, there will be two handlers, which is unnecessary.
+                iframe.contentWindow.removeEventListener("unload", unloadHandler);
+                iframe.contentWindow.addEventListener("unload", unloadHandler);
+            }
+
+            iframe.addEventListener("load", function () {
+                attachUnload();
+
+                // Just in case the change wasn't dispatched during the unload event...
+                dispatchChange();
+            });
+
+            attachUnload();
+        }
+    }
 };
 
 export {helper}
