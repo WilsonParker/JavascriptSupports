@@ -3,65 +3,81 @@
  *
  * @author  WilsonParker
  * @added   2020/12/01
- * @updated 2020/12/08
+ * @updated 2021/12/24
  */
 const modal = {
     props: {
         id: 'componentModal',
-        dismissEvent: function () {
-
-        },
+        confirm_id: 'confirmComponentModal',
+        dismissEvent: undefined,
+        confirmEvent: undefined,
     },
     init: function (id) {
         this.props.id = id;
     },
 
-    show: function () {
-        this.selector.getModal().modal('show');
+    show: function (id = modal.props.id) {
+        this.selector.getModal(id).modal('show');
     },
 
     confirm: function (message, callback) {
-        if(confirm(message)) {
+        this.setContent(message, modal.props.confirm_id);
+        // this.builder.setConfirmEvent(callback);
+        this.selector.getConfirmButton(modal.props.confirm_id).on('click', callback);
+        this.show(modal.props.confirm_id);
+        /*if(confirm(message)) {
             callback();
-        }
+        }*/
+    },
+
+    error: function (error) {
+        this.setContent(error.response.data.message);
+        this.show();
     },
 
     selector: {
-        getModal: function () {
-            return $('#' + modal.props.id);
+        getModal: function (id = modal.props.id) {
+            return $('#' + id);
         },
-        getTitleModal: function () {
-            return $(this.getModal()[0].querySelector('.modal-title'));
+        getTitleModal: function (id = modal.props.id) {
+            return $(this.getModal(id)[0].querySelector('.modal-title'));
         },
-        getContentModal: function () {
-            return $(this.getModal()[0].querySelector('.modal-body'));
+        getContentModal: function (id = modal.props.id) {
+            return $(this.getModal(id)[0].querySelector('.modal-body'));
+        },
+        getConfirmButton: function (id = modal.props.id) {
+            return $(this.getModal(id)[0].querySelector('button[btn-type="confirm"]'));
         },
     },
 
     builder: {
-        setTitle(title) {
-            modal.selector.getTitleModal().html(title);
+        setTitle(title, id = modal.props.id) {
+            modal.selector.getTitleModal(id).html(title);
         },
-        setContent(content) {
-            modal.selector.getContentModal().html(content);
+        setContent(content, id = modal.props.id) {
+            modal.selector.getContentModal(id).html(content);
         },
 
-        setDissmissEvent(event) {
+        setDismissEvent(event) {
             modal.props.dismissEvent = event;
         },
 
+        setConfirmEvent(event) {
+            modal.props.confirmEvent = event;
+        },
+
         parse(data) {
-            var parser = new DOMParser();
-            var doc = parser.parseFromString(data, 'text/html');
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(data, 'text/html');
             return doc;
         },
     },
 
-    setTitle(title) {
-        this.builder.setTitle(title);
+    setTitle(title, id = modal.props.id) {
+        this.builder.setTitle(title, id);
     },
-    setContent(content) {
-        this.builder.setContent(content);
+    setContent(content, id = modal.props.id) {
+        this.builder.setContent(content, id);
     },
 
 };
