@@ -20,14 +20,19 @@ const modal = {
         this.selector.getModal(id).modal('show');
     },
 
+    hide: function (id = modal.props.id) {
+        this.selector.getModal(id).modal('hide');
+    },
+
     confirm: function (message, callback) {
         this.setContent(message, modal.props.confirm_id);
         // this.builder.setConfirmEvent(callback);
-        this.selector.getConfirmButton(modal.props.confirm_id).on('click', callback);
-        this.show(modal.props.confirm_id);
-        /*if(confirm(message)) {
+        let self = this;
+        this.selector.getConfirmButton(modal.props.confirm_id).on('click', function() {
+            self.hide(modal.props.confirm_id);
             callback();
-        }*/
+        });
+        this.show(modal.props.confirm_id);
     },
 
     error: function (error) {
